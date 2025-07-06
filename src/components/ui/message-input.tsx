@@ -1,86 +1,50 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "./button";
-import { storage } from "@/lib/storage";
-import { Message } from "@/lib/types";
+import { database } from "@/lib/database";
 
 interface MessageInputProps {
-  onMessagePosted?: () => void;
+  onMessageSent: () => void;
 }
 
-export function MessageInput({ onMessagePosted }: MessageInputProps) {
-  const [message, setMessage] = useState("");
-  const [author, setAuthor] = useState("");
-  const [error, setError] = useState("");
-  const MAX_CHARS = 280;
+export function MessageInput({ onMessageSent }: MessageInputProps) {
+  const [body, setBody] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    const savedAuthor = storage.getAuthor();
-    if (savedAuthor) {
-      setAuthor(savedAuthor);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!body.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    const success = await database.addPost(body.trim());
+
+    setIsSubmitting(false);
+    if (success) {
+      setBody("");
+      onMessageSent();
     }
-  }, []);
-
-  const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const text = e.target.value;
-    if (text.length <= MAX_CHARS) {
-      setMessage(text);
-      setError("");
-    } else {
-      setError(`Message must be ${MAX_CHARS} characters or less`);
-    }
-  };
-
-  const handleShare = () => {
-    if (!message.trim()) {
-      setError("Message cannot be empty");
-      return;
-    }
-    
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      author: author.trim(),
-      content: message.trim(),
-      timestamp: Date.now()
-    };
-
-    storage.saveMessage(newMessage);
-    setMessage("");
-    setError("");
-    onMessagePosted?.();
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-4">
-      <div className="flex gap-4">
-        <input
-          type="text"
-          value={author}
-          disabled
-          className="flex-shrink-0 w-48 p-2 border rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
-        />
-      </div>
-      <div className="relative">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
         <textarea
-          value={message}
-          onChange={handleMessageChange}
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
           placeholder="What's on your mind?"
-          className="w-full min-h-[100px] p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full min-h-[100px] p-4 rounded-lg border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500"
+          maxLength={280}
         />
-        <div className="absolute bottom-3 right-3 text-sm text-gray-500">
-          {message.length}/{MAX_CHARS}
+        <div className="flex justify-between items-center mt-2">
+          <span className="text-sm text-zinc-500">
+            {body.length}/280 characters
+          </span>
+          <Button type="submit" disabled={!body.trim() || isSubmitting}>
+            {isSubmitting ? "Posting..." : "Post"}
+          </Button>
         </div>
       </div>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      <div className="flex justify-end">
-        <Button 
-          onClick={handleShare}
-          disabled={!message.trim() || message.length > MAX_CHARS}
-        >
-          Share
-        </Button>
-      </div>
-    </div>
+    </form>
   );
 } 
