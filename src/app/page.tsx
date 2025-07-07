@@ -1,68 +1,81 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { MessageInput } from "@/components/ui/message-input";
-import { MessageList } from "@/components/ui/message-list";
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { MessageInput } from "@/components/ui/message-input"
+import { MessageList } from "@/components/ui/message-list"
+import { PhotoUpload } from "@/components/ui/photo-upload"
 import Image from "next/image"
 import { useState } from "react"
 
 export default function Home() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const handleMessageSent = () => {
+  const handleMessagePosted = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  const handlePhotoUploaded = () => {
+    // Refresh the message list to show the new photo post
     setRefreshTrigger(prev => prev + 1);
   };
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-12">
-      <div className="container max-w-2xl mx-auto px-4">
-        {/* Profile Section */}
-        <div className="md:col-span-1">
-          <div className="space-y-6">
-            <div className="flex flex-col items-start space-y-4">
-              {/* Profile Image Container */}
-              <div className="w-full aspect-square relative rounded-lg overflow-hidden">
-                <Image 
-                  src="/profile.jpg"
-                  alt="Greg Wientjes"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  priority
-                  className="hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <h2 className="text-2xl font-bold">Greg Wientjes</h2>
+    <main className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* Profile Section */}
+      <div className="md:col-span-1">
+        <div className="space-y-6">
+          <div className="flex flex-col items-start space-y-4">
+            {/* Profile Image Container */}
+            <div className="w-full aspect-square relative rounded-lg overflow-hidden">
+        <Image
+                src="/profile.jpg"
+                alt="Greg Wientjes"
+                fill
+                style={{ objectFit: 'cover' }}
+          priority
+                className="hover:scale-105 transition-transform duration-300"
+              />
             </div>
-            
-            <Card>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium text-zinc-500">Networks</h4>
-                    <p>Stanford Alum</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-zinc-500">Current City</h4>
-                    <p>Palo Alto, CA</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <h2 className="text-2xl font-bold">Greg Wientjes</h2>
           </div>
-        </div>
-
-        {/* Wall Section */}
-        <div className="md:col-span-2">
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <MessageInput onMessageSent={handleMessageSent} />
+          
+          <Card>
+            <CardHeader className="pb-3">
+              <h3 className="text-lg font-semibold">Information</h3>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-medium text-zinc-500">Networks</h4>
+                  <p>Stanford Alum</p>
+                </div>
+                <div>
+                  <h4 className="font-medium text-zinc-500">Current City</h4>
+                  <p>Palo Alto, CA</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
-
-          {/* Messages */}
-          <MessageList refreshTrigger={refreshTrigger} />
         </div>
       </div>
-    </main>
-  );
+
+      {/* Wall Section */}
+      <div className="md:col-span-2">
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <MessageInput onMessageSent={handleMessagePosted} />
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Add Photo to Wall</h4>
+                <PhotoUpload onPhotoUploaded={handlePhotoUploaded} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Messages */}
+        <MessageList refreshTrigger={refreshTrigger} />
+        </div>
+      </main>
+  )
 }

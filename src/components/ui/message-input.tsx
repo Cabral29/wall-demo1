@@ -11,11 +11,21 @@ interface MessageInputProps {
 export function MessageInput({ onMessageSent }: MessageInputProps) {
   const [body, setBody] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!body.trim() || isSubmitting) return;
+    setError("");
+    
+    if (!body.trim()) {
+      setError("Please enter a message");
+      return;
+    }
+    
+    if (isSubmitting) return;
 
+    console.log('Submitting post:', { body: body.trim() }); // Debug log
+    
     setIsSubmitting(true);
     const success = await database.addPost(body.trim());
 
@@ -23,6 +33,8 @@ export function MessageInput({ onMessageSent }: MessageInputProps) {
     if (success) {
       setBody("");
       onMessageSent();
+    } else {
+      setError("Failed to post message. Please try again.");
     }
   };
 
@@ -40,11 +52,18 @@ export function MessageInput({ onMessageSent }: MessageInputProps) {
           <span className="text-sm text-zinc-500">
             {body.length}/280 characters
           </span>
-          <Button type="submit" disabled={!body.trim() || isSubmitting}>
-            {isSubmitting ? "Posting..." : "Post"}
+          <Button 
+            type="submit" 
+            disabled={!body.trim() || isSubmitting}
+            onClick={handleSubmit}
+          >
+            {isSubmitting ? "Sharing..." : "Share"}
           </Button>
         </div>
       </div>
+      {error && (
+        <p className="text-red-500 text-sm">{error}</p>
+      )}
     </form>
   );
 } 

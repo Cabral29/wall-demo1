@@ -29,6 +29,7 @@ export function MessageList({ refreshTrigger }: MessageListProps) {
   useEffect(() => {
     const fetchPosts = async () => {
       const posts = await database.getPosts();
+      console.log('Fetched posts:', posts); // Debug log
       setPosts(posts);
     };
     fetchPosts();
@@ -43,6 +44,7 @@ export function MessageList({ refreshTrigger }: MessageListProps) {
         schema: 'public',
         table: 'posts',
       }, () => {
+        console.log('Real-time update received'); // Debug log
         database.getPosts().then(setPosts);
       })
       .subscribe();
@@ -77,12 +79,28 @@ export function MessageList({ refreshTrigger }: MessageListProps) {
         <Card key={post.id}>
           <CardContent className="pt-6">
             <div className="flex justify-between items-start">
-              <h3 className="font-semibold mb-2">Greg Wientjes</h3>
+              <h3 className="font-semibold mb-2">
+                Greg Wientjes
+              </h3>
               <span className="text-xs text-gray-400">
                 {getRelativeTime(post.created_at)}
               </span>
             </div>
-            <p className="text-zinc-600">{post.body}</p>
+            <p className="text-zinc-600 mb-3">{post.body}</p>
+            {post.photo_url && (
+              <div className="mt-3">
+                <img
+                  src={`${post.photo_url}?t=${Date.now()}`}
+                  alt="Post image"
+                  className="w-full max-h-96 object-cover rounded-lg"
+                  onError={(e) => {
+                    // Hide the image if it fails to load (file deleted from storage)
+                    e.currentTarget.style.display = 'none';
+                    console.log('Image failed to load, likely deleted from storage:', post.photo_url);
+                  }}
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       ))}

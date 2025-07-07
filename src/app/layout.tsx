@@ -21,7 +21,7 @@ export default function RootLayout({
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-blue-500">wall</h1>
           </header>
-          {children}
+        {children}
         </div>
       </body>
     </html>
