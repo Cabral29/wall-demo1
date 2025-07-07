@@ -7,13 +7,13 @@ import { database } from '@/lib/database'
 import { Button } from './button'
 import { Card, CardContent } from './card'
 import { Upload, X, Send } from 'lucide-react'
+import Image from 'next/image'
 
 interface PhotoUploadProps {
   onPhotoUploaded: () => void
 }
 
 export function PhotoUpload({ onPhotoUploaded }: PhotoUploadProps) {
-  const [uploading, setUploading] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [caption, setCaption] = useState("")
@@ -135,9 +135,11 @@ export function PhotoUpload({ onPhotoUploaded }: PhotoUploadProps) {
           <CardContent className="p-4">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
-                <img
+                <Image
                   src={preview}
                   alt="Preview"
+                  width={800}
+                  height={400}
                   className="w-full h-64 object-cover rounded-lg"
                 />
                 <Button

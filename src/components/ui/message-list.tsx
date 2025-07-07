@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "./card";
 import { database, type Post } from "@/lib/database";
 import { supabase } from "@/lib/supabase";
+import Image from "next/image";
 
 interface MessageListProps {
   refreshTrigger?: number;
@@ -89,9 +90,11 @@ export function MessageList({ refreshTrigger }: MessageListProps) {
             <p className="text-zinc-600 mb-3">{post.body}</p>
             {post.photo_url && (
               <div className="mt-3">
-                <img
+                <Image
                   src={`${post.photo_url}?t=${Date.now()}`}
                   alt="Post image"
+                  width={800}
+                  height={400}
                   className="w-full max-h-96 object-cover rounded-lg"
                   onError={(e) => {
                     // Hide the image if it fails to load (file deleted from storage)

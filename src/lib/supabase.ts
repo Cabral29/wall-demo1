@@ -23,7 +23,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 // Test the connection
-supabase.from('posts').select('count').limit(1).then(({ data, error }) => {
+supabase.from('posts').select('count').limit(1).then(({ error }) => {
   if (error) {
     console.error('Supabase connection test failed:', error);
   } else {
